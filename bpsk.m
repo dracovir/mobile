@@ -1,0 +1,61 @@
+clc;
+clear all;
+close all;
+
+N = 1000000;
+EbN0db = -5:1:15;
+
+BER_sim = zeros(size(EbN0db));
+theoretical_rayleigh = zeros(size(EbN0db));
+
+% Random binary data
+data = randi([0, 1], 1, N);
+
+% BPSK Modulation
+modulated_data = 2.*data - 1;
+
+for i = 1:length(EbN0db)
+
+    EbN0 = 10^(EbN0db(i)/10);
+
+    noise_power = 1/(2*EbN0);
+
+    % Rayleigh Channel
+    h = (1/sqrt(2)) * (randn(1,N) + 1i*randn(1,N));
+
+    % AWGN Noise
+    noise = sqrt(noise_power) * (randn(1,N) + 1i*randn(1,N));
+
+    % Received Signal
+    y_rayleigh = h .* modulated_data + noise;
+
+    % Equalization
+    y_rayleigh_rec = y_rayleigh ./ h;
+
+    % Detection
+    r_rayleigh = real(y_rayleigh_rec) > 0;
+
+    % BER Calculation
+    errors = sum(r_rayleigh ~= data);
+
+    BER_sim(i) = errors / N;
+
+    % Theoretical BER
+    theoretical_rayleigh(i) = 0.5 * (1 - sqrt(EbN0/(1 + EbN0)));
+
+end
+
+% Plot
+semilogy(EbN0db, BER_sim, 'o-');
+hold on;
+
+semilogy(EbN0db, theoretical_rayleigh, '*-');
+
+xlabel('Eb/N0 (dB)');
+ylabel('BER');
+
+title('BPSK over Rayleigh Channel with AWGN');
+
+legend('Practical BER', 'Theoretical BER');
+
+grid on;
