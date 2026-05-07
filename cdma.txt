@@ -1,0 +1,90 @@
+clc;
+clear;
+close all;
+
+% Walsh codes (4 users)
+H = hadamard(4);
+
+% Assign codes
+c1 = H(1,:);
+c2 = H(2,:);
+c3 = H(3,:);
+c4 = H(4,:);
+
+disp("Assigned Codes:");
+disp("c1="), disp(c1)
+disp("c2="), disp(c2)
+disp("c3="), disp(c3)
+disp("c4="), disp(c4)
+
+while true
+
+    disp(" ");
+    disp("Enter your choice:");
+    disp("1 -> r  (CDMA Transmission & Recovery)");
+    disp("2 -> r' (Transpose of Combined Signal)");
+    disp("0 -> Exit");
+
+    choice = input("Enter option: ");
+
+    if choice == 1
+
+        % Input data bits (+1 or -1)
+        d1 = input("Enter d1 (1 or -1): ");
+        d2 = input("Enter d2 (1 or -1): ");
+        d3 = input("Enter d3 (1 or -1): ");
+        d4 = input("Enter d4 (1 or -1): ");
+
+        % Spreading
+        r1 = d1 * c1;
+        r2 = d2 * c2;
+        r3 = d3 * c3;
+        r4 = d4 * c4;
+
+        % Combined signal
+        r = r1 + r2 + r3 + r4;
+
+        disp(" ");
+        disp("Spread Signals:");
+        disp("r1="), disp(r1)
+        disp("r2="), disp(r2)
+        disp("r3="), disp(r3)
+        disp("r4="), disp(r4)
+
+        disp("Combined Signal r = ");
+        disp(r)
+
+        % Receiver (Despreading)
+        rec1 = (r * c1') / 4;
+        rec2 = (r * c2') / 4;
+        rec3 = (r * c3') / 4;
+        rec4 = (r * c4') / 4;
+
+        disp("Recovered Data:");
+        disp([rec1 rec2 rec3 rec4])
+
+        detected = sign([rec1 rec2 rec3 rec4]);
+
+        disp("Detected Bits:");
+        disp(detected)
+
+    elseif choice == 2
+
+        if exist('r','var')
+            disp("Transpose of Combined Signal r' = ");
+            disp(r')
+        else
+            disp("No signal r found. First choose option 1.");
+        end
+
+    elseif choice == 0
+
+        disp("Program Terminated.");
+        break;
+
+    else
+        disp("Invalid Option. Try again.");
+
+    end
+
+end
